@@ -98,7 +98,3 @@ services:
 #    restart: always
 #    ports:
 #      - 8080:8080
-
-volumes:
-  oltp_data:
-  olap_data:
