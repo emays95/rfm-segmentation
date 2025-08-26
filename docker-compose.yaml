@@ -34,7 +34,6 @@ services:
   olap-db:
     image: postgres
     restart: always
-    # set shared memory limit when using docker compose
     shm_size: 1024mb
     # or set shared memory limit when deploy via swarm stack
     #volumes:
