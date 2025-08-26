@@ -14,7 +14,7 @@ services:
     #    tmpfs:
     #      size: 134217728 # 128*2^20 bytes = 128Mb
     ports:
-      - 5433:5432
+      - 5433:5433
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: admin
@@ -22,10 +22,10 @@ services:
 
     volumes:
       - ./sql/oltp:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/postgresql/data
+      - oltp_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d trans-oltp" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d trans_oltp" ]
       interval: 10s
       retries: 5
       timeout: 5s
@@ -43,7 +43,7 @@ services:
     #    tmpfs:
     #      size: 134217728 # 128*2^20 bytes = 128Mb
     ports:
-      - 5434:5432
+      - 5434:5434
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: admin
@@ -51,19 +51,55 @@ services:
 
     volumes:
       - ./sql/olap:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/postgresql/data
+      - olap_data:/var/lib/postgresql/data
 
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d trans-olap" ]
-      interval: 10s
-      retries: 5
-      timeout: 5s
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U admin -d trans_olap" ]
+#      interval: 10s
+#      retries: 5
+#      timeout: 5s
 
-  adminer:
-    image: adminer
-    restart: always
+  airflow:
+    image: apache/airflow:slim-3.0.6rc2-python3.9
+    command:
+      "standalone"
+    depends_on:
+      - olap-db
+      - oltp-db
     ports:
       - 8080:8080
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+
+
+  spark:
+    image: bitnami/spark:latest
+    container_name: spark
+    ports:
+      - 8081:8081 # UI
+      - 7077:7077 # master port
+    volumes:
+      - ./python/spark:/opt/spark/jobs
+
+  jupyter-notebooks:
+    image: jupyter/all-spark-notebook
+    container_name: jupyter_notebooks
+    ports:
+      - 8888:8888
+    depends_on:
+      - oltp-db
+      - olap-db
+      - spark
+      - airflow
+
+
+#
+#  adminer:
+#    image: adminer
+#    restart: always
+#    ports:
+#      - 8080:8080
 
 volumes:
-  db_data:
+  oltp_data:
+  olap_data:
