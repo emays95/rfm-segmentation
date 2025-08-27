@@ -14,7 +14,6 @@ CREATE TABLE IF EXISTS trans_fact(
     payment_method VARCHAR(32),
     city VARCHAR(32),
     store_type VARCHAR(32),
-    season VARCHAR(8),
     promotion VARCHAR(64)
 )
 

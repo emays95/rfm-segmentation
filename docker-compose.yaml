@@ -58,6 +58,25 @@ services:
 #      retries: 5
 #      timeout: 5s
 
+  jupyter-notebooks:
+    image: jupyter/pyspark-notebook
+    container_name: pyspark_notebooks
+    ports:
+      - 8888:8888
+      - 4040:4040
+    depends_on:
+      - oltp-db
+      - olap-db
+
+
+    command: "start-notebook.sh --NotebookApp.token="
+    environment:
+      JUPYTER_TOKEN: "token" # Optional: set a token for access
+      JUPYTER_PASSWORD: "password"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+
+
   airflow:
     image: apache/airflow:slim-3.0.6rc2-python3.9
     command:
@@ -65,31 +84,21 @@ services:
     depends_on:
       - olap-db
       - oltp-db
+      - jupyter-notebooks
     ports:
       - 8080:8080
     volumes:
       - ./airflow/dags:/opt/airflow/dags
 
 
-  spark:
-    image: bitnami/spark:latest
-    container_name: spark
-    ports:
-      - 8081:8081 # UI
-      - 7077:7077 # master port
-    volumes:
-      - ./python/spark:/opt/spark/jobs
-
-  jupyter-notebooks:
-    image: jupyter/all-spark-notebook
-    container_name: jupyter_notebooks
-    ports:
-      - 8888:8888
-    depends_on:
-      - oltp-db
-      - olap-db
-      - spark
-      - airflow
+#  spark:
+#    image: bitnami/spark:latest
+#    container_name: spark
+#    ports:
+#      - 8081:8081 # UI
+#      - 7077:7077 # master port
+#    volumes:
+#      - ./python/spark:/opt/spark/jobs
 
 
 #
