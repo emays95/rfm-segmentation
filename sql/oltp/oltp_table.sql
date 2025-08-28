@@ -9,14 +9,14 @@ CREATE TABLE IF NOT EXISTS trans(
     discount_applied BOOLEAN,
     promotion VARCHAR(64)
 
-)
+);
 
 
 CREATE IF NOT EXISTS trans_prod(
     trans_id VARCHAR(16),
     product VARCHAR(32),
     PRIMARY KEY (trans_id, product)
-)
+);
 
 CREATE SEQUENCE cust_ID_seq
     START WITH 1
@@ -24,6 +24,7 @@ CREATE SEQUENCE cust_ID_seq
     MINVALUE 1
     NO MAXVALUE
     OWNED BY cust.cust_id
+;
 
 
 CREATE IF NOT EXISTS cust(
