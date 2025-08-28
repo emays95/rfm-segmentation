@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS trans_prod(
 
 
 CREATE TABLE IF NOT EXISTS cust(
---     cust_id INT DEFAULT nextval('cust_id_seq') PRIMARY KEY,
     customer_name VARCHAR(64),
     customer_category VARCHAR(32),
     cust_id VARCHAR(16) PRIMARY KEY
