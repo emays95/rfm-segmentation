@@ -64,15 +64,16 @@ services:
     ports:
       - 8888:8888
       - 4040:4040
+
     depends_on:
       - oltp-db
       - olap-db
 
 
-    command: "start-notebook.sh --NotebookApp.token="
+    command: start-notebook.sh --NotebookApp.token=
     environment:
-      JUPYTER_TOKEN: "token" # Optional: set a token for access
-      JUPYTER_PASSWORD: "password"
+      - PYSPARK_SUBMIT_ARGS=--packages org.postgresql:postgresql:42.7.3 pyspark-shell
+      - JUPYTER_TOKEN="token"
     volumes:
       - ./notebooks:/home/jovyan/work
 
