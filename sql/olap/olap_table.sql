@@ -5,16 +5,27 @@ CREATE TABLE IF NOT EXISTS cust_dim(
 
 )
 
-CREATE TABLE IF EXISTS trans_fact(
-    trans_id VARCHAR(50) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS trans_prod_fact(
+    trans_id VARCHAR(50),
+    prod_id VARCHAR(8),
     trans_date DATE,
     customer_ID VARCHAR(64),
-    product VARCHAR(256),
-    total_items INT,
+    PRIMARY KEY (trans_id, prod_id)
+
+)
+
+CREATE TABLE IF NOT EXISTS trans_dim(
+    trans_id VARCHAR(50) PRIMARY KEY,
+    total_cost DECIMAL,
     payment_method VARCHAR(32),
     city VARCHAR(32),
     store_type VARCHAR(32),
     promotion VARCHAR(64)
+)
+
+CREATE TABLE IF NOT EXISTS prod_dim(
+    prod_id VARCHAR(8) PRIMARY KEY,
+    product_name VARCHAR(32)
 )
 
 -- create date dimension table (from Postgres wiki)
