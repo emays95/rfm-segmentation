@@ -1,35 +1,36 @@
 CREATE TABLE IF NOT EXISTS cust_dim(
-    cust_id VARCHAR(32) PRIMARY KEY,
-    cust_name VARCHAR(64),
-    cust_category VARCHAR(32)
+	cust_id VARCHAR(32) PRIMARY KEY,
+	cust_name VARCHAR(64),
+	cust_category VARCHAR(32)
 
-)
+);
 
 CREATE TABLE IF NOT EXISTS trans_prod_fact(
-    trans_id VARCHAR(50),
-    prod_id VARCHAR(8),
-    trans_date DATE,
-    customer_ID VARCHAR(64),
-    PRIMARY KEY (trans_id, prod_id)
+	trans_id VARCHAR(50),
+	product_id VARCHAR(8),
+	trans_date DATE,
+	customer_ID VARCHAR(64),
+	PRIMARY KEY (trans_id, product_id)
 
-)
+);
 
 CREATE TABLE IF NOT EXISTS trans_dim(
-    trans_id VARCHAR(50) PRIMARY KEY,
-    total_cost DECIMAL,
-    payment_method VARCHAR(32),
-    city VARCHAR(32),
-    store_type VARCHAR(32),
-    promotion VARCHAR(64)
-)
+	trans_id VARCHAR(50) PRIMARY KEY,
+	total_cost DECIMAL,
+	payment_method VARCHAR(32),
+	city VARCHAR(32),
+	store_type VARCHAR(32),
+	discount_applied BOOLEAN,
+	promotion VARCHAR(64)
+);
 
 CREATE TABLE IF NOT EXISTS prod_dim(
-    prod_id VARCHAR(8) PRIMARY KEY,
-    product_name VARCHAR(32)
-)
+	product_id VARCHAR(8) PRIMARY KEY,
+	product_name VARCHAR(32)
+);
 
 -- create date dimension table (from Postgres wiki)
-CREATE TABLE IF EXISTS date_dim AS
+CREATE TABLE IF NOT EXISTS date_dim AS
 SELECT
 	datum as Date,
 	extract(year from datum) AS Year,
@@ -51,18 +52,18 @@ SELECT
 	-- Weekend
 	CASE WHEN extract(isodow from datum) in (6, 7) THEN 'Weekend' ELSE 'Weekday' END AS Weekend,
 	-- Fixed holidays
-        -- for America
-        CASE WHEN to_char(datum, 'MMDD') IN ('0101', '0704', '1225', '1226')
+		-- for America
+		CASE WHEN to_char(datum, 'MMDD') IN ('0101', '0704', '1225', '1226')
 		THEN 'Holiday' ELSE 'No holiday' END
 		AS AmericanHoliday,
-        -- for Canada
-        CASE WHEN to_char(datum, 'MMDD') IN ('0101', '0701', '1225', '1226')
+		-- for Canada
+		CASE WHEN to_char(datum, 'MMDD') IN ('0101', '0701', '1225', '1226')
 		THEN 'Holiday' ELSE 'No holiday' END
 		AS CanadianHoliday,
 	-- Some periods of the year, adjust for your organisation and country
 	CASE WHEN to_char(datum, 'MMDD') BETWEEN '0601' AND '0731' THEN 'Summer break'
-	     WHEN to_char(datum, 'MMDD') BETWEEN '1115' AND '1225' THEN 'Christmas season'
-	     WHEN to_char(datum, 'MMDD') > '1225' OR to_char(datum, 'MMDD') <= '0106' THEN 'Winter break'
+		 WHEN to_char(datum, 'MMDD') BETWEEN '1115' AND '1225' THEN 'Christmas season'
+		 WHEN to_char(datum, 'MMDD') > '1225' OR to_char(datum, 'MMDD') <= '0106' THEN 'Winter break'
 		ELSE 'Normal' END
 		AS Period,
 	-- ISO start and end of the week of this date
@@ -76,6 +77,6 @@ FROM (
 	SELECT '2020-01-01'::DATE + sequence.day AS datum
 	FROM generate_series(0,3652) AS sequence(day)
 	GROUP BY sequence.day
-     ) DQ
-order by 1
+	 ) DQ
+order by 1;
 
